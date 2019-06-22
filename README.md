@@ -1,6 +1,8 @@
 > # 🧶 tracer
 >
-> Simple lightweight tracing mechanism.
+> Simple, lightweight tracing mechanism.
+
+[![Documentation][icon_docs]][page_docs]
 
 ## 💡 Idea
 
@@ -17,13 +19,13 @@ Full description of the idea is available
 
 ## 🏆 Motivation
 
-In [Avito](https://tech.avito.ru) we use the [Jaeger](https://www.jaegertracing.io) - a distributed tracing platform.
-It is really useful in most cases, but at production we also use sampling. So, what is a problem you say?
+In [Avito](https://tech.avito.ru), we use the [Jaeger](https://www.jaegertracing.io) - a distributed tracing platform.
+It is handy in most cases, but at production, we also use sampling. So, what is a problem, you say?
 
 I had 0.02% requests with a `write: broken pipe` error and it was difficult to find the appropriate one in
 the [Sentry](https://sentry.io) which also has related to it trace in the [Jaeger](https://www.jaegertracing.io).
 
-For that reason I wrote the simple solution to handle this kernel case and found the bottleneck in our code quickly.
+For that reason, I wrote the simple solution to handle this specific case and found the bottleneck in our code quickly.
 
 ## 🤼‍♂️ How to
 
@@ -37,13 +39,13 @@ import (
 )
 
 func InjectTracer(handler http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		req = req.WithContext(tracer.Inject(req.Context(), make([]tracer.Call, 0, 10)))
-		handler.ServeHTTP(w, req)
+		handler.ServeHTTP(rw, req)
 	})
 }
 
-func Handle(w http.ResponseWriter, req *http.Request) {
+func Handle(rw http.ResponseWriter, req *http.Request) {
 	ctx, cancel := context.WithTimeout(req.Context(), time.Second)
 	defer cancel()
 
@@ -55,10 +57,10 @@ func Handle(w http.ResponseWriter, req *http.Request) {
 
 	trace.Breakpoint().Mark("store")
 	if err := StoreIntoDatabase(ctx, data); err != nil {
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		http.Error(rw, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
-	w.WriteHeader(http.StatusOK)
+	rw.WriteHeader(http.StatusOK)
 }
 
 func FetchData(ctx context.Context, r io.Reader) Data {
@@ -83,6 +85,8 @@ Coming soon.
 made with ❤️ for everyone
 
 [icon_build]:      https://travis-ci.org/kamilsk/tracer.svg?branch=master
+[icon_docs]:       https://godoc.org/github.com/kamilsk/tracer?status.svg
 
 [page_build]:      https://travis-ci.org/kamilsk/tracer
+[page_docs]:       https://godoc.org/github.com/kamilsk/tracer
 [page_promo]:      https://github.com/kamilsk/tracer
