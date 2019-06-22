@@ -2,11 +2,10 @@ package tracer
 
 import "runtime"
 
-// Caller returns information about the current caller.
+// Caller returns information about a caller at position after the skip steps.
 //
 //  func StoreToDatabase(data Payload) error {
-//  	timer := stats.NewTiming()
-//  	defer timer.Send(Caller(2).Name)
+//  	defer stats.NewTiming().Send(Caller(2).Name)
 //
 //  	// do something heavy
 //  }
