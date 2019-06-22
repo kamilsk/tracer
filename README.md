@@ -1,6 +1,6 @@
 > # 🧶 tracer
 >
-> Lightweight tracing mechanism.
+> Simple lightweight tracing mechanism.
 
 ## 💡 Idea
 
@@ -17,24 +17,60 @@ Full description of the idea is available
 
 ## 🏆 Motivation
 
-Coming soon.
+In [Avito](https://tech.avito.ru) we use the [Jaeger](https://www.jaegertracing.io) - a distributed tracing platform.
+It is really useful in most cases, but at production we also use sampling. So, what is a problem you say?
+
+I had 0.02% requests with a `write: broken pipe` error and it was difficult to find the appropriate one in
+the [Sentry](https://sentry.io) which also has related to it trace in the [Jaeger](https://www.jaegertracing.io).
+
+For that reason I wrote the simple solution to handle this kernel case and found the bottleneck in our code quickly.
 
 ## 🤼‍♂️ How to
 
 ```go
-import "github.com/kamilsk/tracer"
+import (
+	"context"
+	"net/http"
+	"time"
 
-func Do(ctx context.Context) {
-	trace := tracer.Fetch(ctx)
-	defer trace.Start().Mark("49cfe2b9-1942-47f1-92f6-6e7be7243845").Stop()
+	"github.com/kamilsk/tracer"
+)
 
-	// do some heavy job
+func InjectTracer(handler http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		req = req.WithContext(tracer.Inject(req.Context(), make([]tracer.Call, 0, 10)))
+		handler.ServeHTTP(w, req)
+	})
+}
 
-	trace.Breakpoint()
+func Handle(w http.ResponseWriter, req *http.Request) {
+	ctx, cancel := context.WithTimeout(req.Context(), time.Second)
+	defer cancel()
 
-	// do some heavy job
+	trace := tracer.Fetch(req.Context())
+	defer trace.Start().Mark(req.Header.Get("X-Request-Id")).Stop()
 
-	trace.Breakpoint().Mark("c246ba1f-8a12-40ed-b4f7-b39289253ca1")
+	trace.Breakpoint().Mark("serialize")
+	data := FetchData(ctx, req.Body)
+
+	trace.Breakpoint().Mark("store")
+	if err := StoreIntoDatabase(ctx, data); err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+}
+
+func FetchData(ctx context.Context, r io.Reader) Data {
+	defer tracer.Fetch(ctx).Start().Stop()
+
+	// fetch a data into a struct
+}
+
+func StoreIntoDatabase(ctx context.Context, data Data) error {
+	defer tracer.Fetch(ctx).Start().Stop()
+
+	// store the data into a database
 }
 ```
 
