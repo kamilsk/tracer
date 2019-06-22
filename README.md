@@ -27,11 +27,11 @@ import "github.com/kamilsk/tracer"
 func Do(ctx context.Context) {
 	defer tracer.Fetch(ctx).Start().Mark("49cfe2b9-1942-47f1-92f6-6e7be7243845").Stop()
 
-	// do some job
+	// do something heavy
 
 	tracer.Fetch(ctx).Breakpoint()
 
-	// do some job
+	// do something heavy
 
 	tracer.Fetch(ctx).Breakpoint().Mark("c246ba1f-8a12-40ed-b4f7-b39289253ca1")
 }
