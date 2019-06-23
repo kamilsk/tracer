@@ -22,7 +22,7 @@ func callerC() CallerInfo {
 }
 
 func traceRoot(ctx context.Context) {
-	call := Fetch(ctx).Start().Mark("root")
+	call := Fetch(ctx).Start("root")
 	defer call.Stop()
 
 	call.Checkpoint("checkpointA")
@@ -33,7 +33,7 @@ func traceRoot(ctx context.Context) {
 }
 
 func traceA(ctx context.Context) {
-	call := Fetch(ctx).Start().Mark("A")
+	call := Fetch(ctx).Start("A")
 	defer call.Stop()
 
 	call.Checkpoint("checkpointA1")
@@ -55,7 +55,7 @@ func traceA2(ctx context.Context) {
 }
 
 func traceB(ctx context.Context) {
-	call := Fetch(ctx).Start().Mark("B")
+	call := Fetch(ctx).Start("B")
 	defer call.Stop()
 
 	call.Checkpoint("checkpointB1")

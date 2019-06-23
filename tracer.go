@@ -8,21 +8,29 @@ import (
 )
 
 type Trace struct {
-	stack     []*Call
+	stack     []Call
 	allocates int
 }
 
-func (trace *Trace) Start() *Call {
+func (trace *Trace) Start(labels ...string) ptr {
 	if trace == nil {
-		return nil
+		return ptr{}
 	}
 
+	var (
+		id   string
+		tags []string
+	)
+	if len(labels) > 0 {
+		id = labels[0]
+		tags = labels[1:]
+	}
+	call := Call{caller: Caller(3), start: time.Now(), id: id, tags: tags}
 	if len(trace.stack) == cap(trace.stack) {
 		trace.allocates++
 	}
-	call := &Call{caller: Caller(3), start: time.Now()}
 	trace.stack = append(trace.stack, call)
-	return call
+	return ptr{trace, len(trace.stack) - 1}
 }
 
 func (trace *Trace) String() string {
@@ -71,44 +79,42 @@ type Call struct {
 	caller      CallerInfo
 	start, stop time.Time
 	id          string
+	tags        []string
 	checkpoints []Checkpoint
 	allocates   int
 }
 
-func (call *Call) Checkpoint(labels ...string) {
-	if call == nil {
-		return
-	}
-
-	var id string
-	if len(labels) > 0 {
-		id = labels[0]
-	}
-	checkpoint := Checkpoint{id: id, timestamp: time.Now()}
-	if len(call.checkpoints) == cap(call.checkpoints) {
-		call.allocates++
-	}
-	call.checkpoints = append(call.checkpoints, checkpoint)
-}
-
-func (call *Call) Mark(id string) *Call {
-	if call == nil {
-		return nil
-	}
-
-	call.id = id
-	return call
-}
-
-func (call *Call) Stop() {
-	if call == nil {
-		return
-	}
-
-	call.stop = time.Now()
-}
-
 type Checkpoint struct {
 	id        string
+	tags      []string
 	timestamp time.Time
+}
+
+type ptr struct {
+	*Trace
+	int
+}
+
+func (call ptr) Checkpoint(labels ...string) {
+	var (
+		id   string
+		tags []string
+	)
+	if len(labels) > 0 {
+		id = labels[0]
+		tags = labels[1:]
+	}
+	checkpoint := Checkpoint{id: id, tags: tags, timestamp: time.Now()}
+	if len(call.stack[call.int].checkpoints) == cap(call.stack[call.int].checkpoints) {
+		call.stack[call.int].allocates++
+	}
+	call.stack[call.int].checkpoints = append(call.stack[call.int].checkpoints, checkpoint)
+}
+
+func (call ptr) Stop() {
+	if call.Trace == nil {
+		return
+	}
+
+	call.stack[call.int].stop = time.Now()
 }

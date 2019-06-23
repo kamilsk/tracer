@@ -9,6 +9,6 @@ func Fetch(ctx context.Context) *Trace {
 	return trace
 }
 
-func Inject(ctx context.Context, stack []*Call) context.Context {
+func Inject(ctx context.Context, stack []Call) context.Context {
 	return context.WithValue(ctx, key{}, &Trace{stack: stack})
 }

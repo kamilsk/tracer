@@ -48,7 +48,7 @@ func Example() {
 
 func InjectTracer(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-		req = req.WithContext(tracer.Inject(req.Context(), make([]*tracer.Call, 0, 2)))
+		req = req.WithContext(tracer.Inject(req.Context(), make([]tracer.Call, 0, 2)))
 		handler.ServeHTTP(rw, req)
 	})
 }
@@ -64,7 +64,7 @@ func Handle(rw http.ResponseWriter, req *http.Request) {
 	ctx, cancel := context.WithTimeout(req.Context(), time.Second)
 	defer cancel()
 
-	call := tracer.Fetch(req.Context()).Start().Mark(req.Header.Get("X-Request-Id"))
+	call := tracer.Fetch(req.Context()).Start(req.Header.Get("X-Request-Id"))
 	defer call.Stop()
 
 	time.Sleep(time.Millisecond)
