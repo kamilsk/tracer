@@ -40,7 +40,7 @@ import (
 
 func InjectTracer(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-		req = req.WithContext(tracer.Inject(req.Context(), make([]tracer.Call, 0, 10)))
+		req = req.WithContext(tracer.Inject(req.Context(), make([]*tracer.Call, 0, 10)))
 		handler.ServeHTTP(rw, req)
 	})
 }
@@ -52,14 +52,16 @@ func Handle(rw http.ResponseWriter, req *http.Request) {
 	call := tracer.Fetch(req.Context()).Start().Mark(req.Header.Get("X-Request-Id"))
 	defer call.Stop()
 
-    ...
+	...
 
 	call.Checkpoint().Mark("serialize")
 	data := FetchData(ctx, req.Body)
 
 	call.Checkpoint().Mark("store")
 	if err := StoreIntoDatabase(ctx, data); err != nil {
-		http.Error(rw, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		http.Error(rw,
+			http.StatusText(http.StatusInternalServerError),
+			http.StatusInternalServerError)
 		return
 	}
 	rw.WriteHeader(http.StatusOK)
@@ -80,7 +82,15 @@ func StoreIntoDatabase(ctx context.Context, data Data) error {
 
 ## 🧩 Integration
 
-Coming soon.
+This library uses [SemVer](https://semver.org/) for versioning, and it is not
+[BC](https://en.wikipedia.org/wiki/Backward_compatibility)-safe through major releases.
+You can use [dep][] or [go modules][gomod] to manage its version.
+
+```bash
+$ dep ensure -add github.com/kamilsk/tracer
+
+$ go get -u github.com/kamilsk/tracer
+```
 
 ---
 
@@ -92,3 +102,6 @@ made with ❤️ for everyone
 [page_build]:      https://travis-ci.org/kamilsk/tracer
 [page_docs]:       https://godoc.org/github.com/kamilsk/tracer
 [page_promo]:      https://github.com/kamilsk/tracer
+
+[dep]:             https://golang.github.io/dep/
+[gomod]:           https://github.com/golang/go/wiki/Modules
