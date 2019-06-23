@@ -23,7 +23,7 @@ In [Avito](https://tech.avito.ru), we use the [Jaeger](https://www.jaegertracing
 It is handy in most cases, but at production, we also use sampling. So, what is a problem, you say?
 
 I had 0.02% requests with a `write: broken pipe` error and it was difficult to find the appropriate one in
-the [Sentry](https://sentry.io) which also has related to it trace in the [Jaeger](https://www.jaegertracing.io).
+the [Sentry](https://sentry.io) which also has trace related to it in the [Jaeger](https://www.jaegertracing.io).
 
 For that reason, I wrote the simple solution to handle this specific case and found the bottleneck in our code quickly.
 
@@ -49,13 +49,15 @@ func Handle(rw http.ResponseWriter, req *http.Request) {
 	ctx, cancel := context.WithTimeout(req.Context(), time.Second)
 	defer cancel()
 
-	trace := tracer.Fetch(req.Context())
-	defer trace.Start().Mark(req.Header.Get("X-Request-Id")).Stop()
+	call := tracer.Fetch(req.Context()).Start().Mark(req.Header.Get("X-Request-Id"))
+	defer call.Stop()
 
-	trace.Breakpoint().Mark("serialize")
+    ...
+
+	call.Checkpoint().Mark("serialize")
 	data := FetchData(ctx, req.Body)
 
-	trace.Breakpoint().Mark("store")
+	call.Checkpoint().Mark("store")
 	if err := StoreIntoDatabase(ctx, data); err != nil {
 		http.Error(rw, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return

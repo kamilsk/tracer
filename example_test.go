@@ -32,23 +32,23 @@ func Example() {
 
 	raw := rec.Body.String()
 	raw = regexp.MustCompile(`Handle: (\d{2}\.\d+ms)`).ReplaceAllString(raw, "Handle: 12.345678ms")
-	raw = regexp.MustCompile(`serialize: (\d\.\d+µs)`).ReplaceAllString(raw, "serialize: 1.234µs")
+	raw = regexp.MustCompile(`serialize: (\d\.\d+ms)`).ReplaceAllString(raw, "serialize: 1.234567ms")
 	raw = regexp.MustCompile(`store: (\d\.\d+ms)`).ReplaceAllString(raw, "store: 1.234567ms")
 	raw = regexp.MustCompile(`FetchData: (\d\.\d+ms)`).ReplaceAllString(raw, "FetchData: 1.234567ms")
 	raw = regexp.MustCompile(`StoreIntoDatabase: (\d{2}\.\d+ms)`).ReplaceAllString(raw, "StoreIntoDatabase: 12.345678ms")
 	_, _ = io.Copy(os.Stdout, strings.NewReader(raw))
 	// Output:
-	// tracer_test.FetchData: 1.234567ms, allocates: 0
-	// tracer_test.StoreIntoDatabase: 12.345678ms, allocates: 0
-	// tracer_test.Handle: 12.345678ms, allocates: 2
-	//	serialize: 1.234µs
-	//	store: 1.234567ms
-	// allocates: 0
+	// allocates at call stack: 1, detailed call stack:
+	// 	tracer_test.Handle: 12.345678ms, allocates: 2
+	// 		serialize: 1.234567ms
+	// 		store: 1.234567ms
+	// 	tracer_test.FetchData: 1.234567ms, allocates: 0
+	// 	tracer_test.StoreIntoDatabase: 12.345678ms, allocates: 0
 }
 
 func InjectTracer(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-		req = req.WithContext(tracer.Inject(req.Context(), make([]tracer.Call, 0, 2)))
+		req = req.WithContext(tracer.Inject(req.Context(), make([]*tracer.Call, 0, 2)))
 		handler.ServeHTTP(rw, req)
 	})
 }
@@ -64,17 +64,21 @@ func Handle(rw http.ResponseWriter, req *http.Request) {
 	ctx, cancel := context.WithTimeout(req.Context(), time.Second)
 	defer cancel()
 
-	trace := tracer.Fetch(req.Context())
-	defer trace.Start().Mark(req.Header.Get("X-Request-Id")).Stop()
+	call := tracer.Fetch(req.Context()).Start().Mark(req.Header.Get("X-Request-Id"))
+	defer call.Stop()
 
-	trace.Breakpoint().Mark("serialize")
+	time.Sleep(time.Millisecond)
+
+	call.Checkpoint().Mark("serialize")
 	data, err := FetchData(ctx, req.Body)
 	if err != nil {
 		http.Error(rw, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	trace.Breakpoint().Mark("store")
+	time.Sleep(time.Millisecond)
+
+	call.Checkpoint().Mark("store")
 	if err := StoreIntoDatabase(ctx, data); err != nil {
 		http.Error(rw, err.Error(), http.StatusInternalServerError)
 		return

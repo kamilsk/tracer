@@ -1,89 +1,28 @@
 package tracer
 
 import (
-	"context"
 	"path"
 	"strconv"
 	"strings"
 	"time"
 )
 
-func Fetch(ctx context.Context) *Trace {
-	trace, _ := ctx.Value(key{}).(*Trace)
-	return trace
-}
-
-func Inject(ctx context.Context, stack []Call) context.Context {
-	return context.WithValue(ctx, key{}, &Trace{in: stack, out: make([]Call, 0, len(stack))})
-}
-
-type key struct{}
-
 type Trace struct {
-	in, out   []Call
+	stack     []*Call
 	allocates int
 }
 
-func (trace *Trace) Start() *Trace {
+func (trace *Trace) Start() *Call {
 	if trace == nil {
 		return nil
 	}
 
-	if len(trace.in) == cap(trace.in) {
+	if len(trace.stack) == cap(trace.stack) {
 		trace.allocates++
 	}
-	trace.in = append(trace.in, Call{caller: Caller(3), start: time.Now()})
-	return trace
-}
-
-func (trace *Trace) Stop() {
-	if trace == nil {
-		return
-	}
-
-	var (
-		call Call
-		last = len(trace.in) - 1
-	)
-	if last < 0 {
-		return
-	}
-	call, trace.in = trace.in[last], trace.in[:last]
-	call.stop = time.Now()
-	trace.out = append(trace.out, call)
-}
-
-func (trace *Trace) Mark(id string) *Trace {
-	if trace == nil {
-		return nil
-	}
-
-	last := len(trace.in) - 1
-	if last < 0 {
-		return nil
-	}
-	trace.in[last].id = id
-
-	return trace
-}
-
-func (trace *Trace) Breakpoint() *Breakpoint {
-	if trace == nil {
-		return nil
-	}
-
-	last := len(trace.in) - 1
-	if last < 0 {
-		return nil
-	}
-
-	breakpoint := &Breakpoint{timestamp: time.Now()}
-	if len(trace.in[last].breakpoints) == cap(trace.in[last].breakpoints) {
-		trace.in[last].allocates++
-	}
-	trace.in[last].breakpoints = append(trace.in[last].breakpoints, breakpoint)
-
-	return breakpoint
+	call := &Call{caller: Caller(3), start: time.Now()}
+	trace.stack = append(trace.stack, call)
+	return call
 }
 
 func (trace *Trace) String() string {
@@ -92,48 +31,91 @@ func (trace *Trace) String() string {
 	}
 
 	builder := strings.Builder{}
-	for i := len(trace.out) - 1; i >= 0; i-- {
-		call := trace.out[i]
+	builder.WriteString("allocates at call stack: ")
+	builder.WriteString(strconv.Itoa(trace.allocates))
+	builder.WriteString(", detailed call stack:\n")
+	for _, call := range trace.stack {
+		builder.WriteRune('\t')
 		builder.WriteString(path.Base(call.caller.Name))
 		builder.WriteString(": ")
 		builder.WriteString(call.stop.Sub(call.start).String())
+		builder.WriteString(", allocates: ")
+		builder.WriteString(strconv.Itoa(call.allocates))
 		builder.WriteRune('\n')
-		for _, breakpoint := range call.breakpoints {
-			builder.WriteRune('\t')
-			id := breakpoint.id
-			if id == "" {
-				id = "breakpoint"
-			}
-			builder.WriteString(id)
+
+		prev := call.start
+		for _, checkpoint := range call.checkpoints {
+			builder.WriteString("\t\t")
+			builder.WriteString(checkpoint.ID())
 			builder.WriteString(": ")
-			builder.WriteString(breakpoint.timestamp.Sub(call.start).String())
-			builder.WriteString(", allocates: ")
-			builder.WriteString(strconv.Itoa(call.allocates))
+			builder.WriteString(checkpoint.timestamp.Sub(prev).String())
 			builder.WriteRune('\n')
+			prev = checkpoint.timestamp
 		}
 	}
-	builder.WriteString("allocates: ")
-	builder.WriteString(strconv.Itoa(trace.allocates))
+
 	return builder.String()
-}
-
-type Breakpoint struct {
-	id        string
-	timestamp time.Time
-}
-
-func (breakpoint *Breakpoint) Mark(id string) {
-	if breakpoint == nil {
-		return
-	}
-
-	breakpoint.id = id
 }
 
 type Call struct {
 	caller      CallerInfo
 	start, stop time.Time
 	id          string
-	breakpoints []*Breakpoint
+	checkpoints []*Checkpoint
 	allocates   int
+}
+
+func (call *Call) Checkpoint() *Checkpoint {
+	if call == nil {
+		return nil
+	}
+
+	checkpoint := &Checkpoint{timestamp: time.Now()}
+	if len(call.checkpoints) == cap(call.checkpoints) {
+		call.allocates++
+	}
+	call.checkpoints = append(call.checkpoints, checkpoint)
+
+	return checkpoint
+}
+
+func (call *Call) ID() string {
+	return ""
+}
+
+func (call *Call) Mark(id string) *Call {
+	if call == nil {
+		return nil
+	}
+
+	call.id = id
+	return call
+}
+
+func (call *Call) Stop() {
+	if call == nil {
+		return
+	}
+
+	call.stop = time.Now()
+}
+
+type Checkpoint struct {
+	id        string
+	timestamp time.Time
+}
+
+func (checkpoint *Checkpoint) ID() string {
+	if checkpoint.id == "" {
+		return "checkpoint"
+	}
+	return checkpoint.id
+}
+
+func (checkpoint *Checkpoint) Mark(id string) {
+	if checkpoint == nil {
+		return
+	}
+
+	checkpoint.id = id
 }
