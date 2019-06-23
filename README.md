@@ -49,15 +49,15 @@ func Handle(rw http.ResponseWriter, req *http.Request) {
 	ctx, cancel := context.WithTimeout(req.Context(), time.Second)
 	defer cancel()
 
-	call := tracer.Fetch(req.Context()).Start().Mark(req.Header.Get("X-Request-Id"))
+	call := tracer.Fetch(req.Context()).Start(req.Header.Get("X-Request-Id"))
 	defer call.Stop()
 
 	...
 
-	call.Checkpoint().Mark("serialize")
+	call.Checkpoint("serialize")
 	data := FetchData(ctx, req.Body)
 
-	call.Checkpoint().Mark("store")
+	call.Checkpoint("store")
 	if err := StoreIntoDatabase(ctx, data); err != nil {
 		http.Error(rw,
 			http.StatusText(http.StatusInternalServerError),

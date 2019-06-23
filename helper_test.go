@@ -25,10 +25,10 @@ func traceRoot(ctx context.Context) {
 	call := Fetch(ctx).Start().Mark("root")
 	defer call.Stop()
 
-	call.Checkpoint().Mark("checkpointA")
+	call.Checkpoint("checkpointA")
 	traceA(ctx)
 
-	call.Checkpoint().Mark("checkpointB")
+	call.Checkpoint("checkpointB")
 	traceB(ctx)
 }
 
@@ -36,10 +36,10 @@ func traceA(ctx context.Context) {
 	call := Fetch(ctx).Start().Mark("A")
 	defer call.Stop()
 
-	call.Checkpoint().Mark("checkpointA1")
+	call.Checkpoint("checkpointA1")
 	traceA1(ctx)
 
-	call.Checkpoint().Mark("checkpointA2")
+	call.Checkpoint("checkpointA2")
 	traceA2(ctx)
 }
 
@@ -58,10 +58,10 @@ func traceB(ctx context.Context) {
 	call := Fetch(ctx).Start().Mark("B")
 	defer call.Stop()
 
-	call.Checkpoint().Mark("checkpointB1")
+	call.Checkpoint("checkpointB1")
 	traceB1(ctx)
 
-	call.Checkpoint().Mark("checkpointB2")
+	call.Checkpoint("checkpointB2")
 	func(ctx context.Context) {
 		defer Fetch(ctx).Start().Stop()
 	}(ctx)

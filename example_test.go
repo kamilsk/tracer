@@ -69,7 +69,7 @@ func Handle(rw http.ResponseWriter, req *http.Request) {
 
 	time.Sleep(time.Millisecond)
 
-	call.Checkpoint().Mark("serialize")
+	call.Checkpoint("serialize")
 	data, err := FetchData(ctx, req.Body)
 	if err != nil {
 		http.Error(rw, err.Error(), http.StatusInternalServerError)
@@ -78,7 +78,7 @@ func Handle(rw http.ResponseWriter, req *http.Request) {
 
 	time.Sleep(time.Millisecond)
 
-	call.Checkpoint().Mark("store")
+	call.Checkpoint("store")
 	if err := StoreIntoDatabase(ctx, data); err != nil {
 		http.Error(rw, err.Error(), http.StatusInternalServerError)
 		return
