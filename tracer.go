@@ -33,23 +33,33 @@ func (trace *Trace) String() string {
 	builder := strings.Builder{}
 	builder.WriteString("allocates at call stack: ")
 	builder.WriteString(strconv.Itoa(trace.allocates))
-	builder.WriteString(", detailed call stack:\n")
+	builder.WriteString(", detailed call stack:")
+	if len(trace.stack) == 0 {
+		builder.WriteString(" ~")
+	}
 	for _, call := range trace.stack {
-		builder.WriteRune('\t')
+		builder.WriteString("\n\tcall ")
 		builder.WriteString(path.Base(call.caller.Name))
+		if call.id != "" {
+			builder.WriteString(" [")
+			builder.WriteString(call.id)
+			builder.WriteRune(']')
+		}
 		builder.WriteString(": ")
 		builder.WriteString(call.stop.Sub(call.start).String())
 		builder.WriteString(", allocates: ")
 		builder.WriteString(strconv.Itoa(call.allocates))
-		builder.WriteRune('\n')
 
 		prev := call.start
 		for _, checkpoint := range call.checkpoints {
-			builder.WriteString("\t\t")
-			builder.WriteString(checkpoint.ID())
+			builder.WriteString("\n\t\tcheckpoint")
+			if checkpoint.id != "" {
+				builder.WriteString(" [")
+				builder.WriteString(checkpoint.id)
+				builder.WriteRune(']')
+			}
 			builder.WriteString(": ")
 			builder.WriteString(checkpoint.timestamp.Sub(prev).String())
-			builder.WriteRune('\n')
 			prev = checkpoint.timestamp
 		}
 	}
@@ -79,10 +89,6 @@ func (call *Call) Checkpoint() *Checkpoint {
 	return checkpoint
 }
 
-func (call *Call) ID() string {
-	return ""
-}
-
 func (call *Call) Mark(id string) *Call {
 	if call == nil {
 		return nil
@@ -103,13 +109,6 @@ func (call *Call) Stop() {
 type Checkpoint struct {
 	id        string
 	timestamp time.Time
-}
-
-func (checkpoint *Checkpoint) ID() string {
-	if checkpoint.id == "" {
-		return "checkpoint"
-	}
-	return checkpoint.id
 }
 
 func (checkpoint *Checkpoint) Mark(id string) {

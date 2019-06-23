@@ -20,8 +20,8 @@ func TestCaller(t *testing.T) {
 	for _, test := range tests {
 		tc := test
 		t.Run(test.name, func(t *testing.T) {
-			if !reflect.DeepEqual(tc.expected, tc.caller().Name) {
-				t.Errorf("\n expected: %+#v \n obrained: %+#v", tc.expected, tc.caller().Name)
+			if expected, obtained := tc.expected, tc.caller().Name; !reflect.DeepEqual(tc.expected, obtained) {
+				t.Errorf("\n expected: %+#v \n obtained: %+#v", expected, obtained)
 			}
 		})
 	}

@@ -31,19 +31,19 @@ func Example() {
 	handler.ServeHTTP(rec, req)
 
 	raw := rec.Body.String()
-	raw = regexp.MustCompile(`Handle: (\d{2}\.\d+ms)`).ReplaceAllString(raw, "Handle: 12.345678ms")
-	raw = regexp.MustCompile(`serialize: (\d\.\d+ms)`).ReplaceAllString(raw, "serialize: 1.234567ms")
-	raw = regexp.MustCompile(`store: (\d\.\d+ms)`).ReplaceAllString(raw, "store: 1.234567ms")
+	raw = regexp.MustCompile(`Handle (.+): (\d{2}\.\d+ms)`).ReplaceAllString(raw, "Handle $1: 12.345678ms")
+	raw = regexp.MustCompile(`\[serialize]: (\d\.\d+ms)`).ReplaceAllString(raw, "[serialize]: 1.234567ms")
+	raw = regexp.MustCompile(`\[store]: (\d\.\d+ms)`).ReplaceAllString(raw, "[store]: 1.234567ms")
 	raw = regexp.MustCompile(`FetchData: (\d\.\d+ms)`).ReplaceAllString(raw, "FetchData: 1.234567ms")
 	raw = regexp.MustCompile(`StoreIntoDatabase: (\d{2}\.\d+ms)`).ReplaceAllString(raw, "StoreIntoDatabase: 12.345678ms")
 	_, _ = io.Copy(os.Stdout, strings.NewReader(raw))
 	// Output:
 	// allocates at call stack: 1, detailed call stack:
-	// 	tracer_test.Handle: 12.345678ms, allocates: 2
-	// 		serialize: 1.234567ms
-	// 		store: 1.234567ms
-	// 	tracer_test.FetchData: 1.234567ms, allocates: 0
-	// 	tracer_test.StoreIntoDatabase: 12.345678ms, allocates: 0
+	// 	call tracer_test.Handle [ca7a87c4-58d0-4fdf-857c-ef49fc3bf271]: 12.345678ms, allocates: 2
+	// 		checkpoint [serialize]: 1.234567ms
+	// 		checkpoint [store]: 1.234567ms
+	// 	call tracer_test.FetchData: 1.234567ms, allocates: 0
+	// 	call tracer_test.StoreIntoDatabase: 12.345678ms, allocates: 0
 }
 
 func InjectTracer(handler http.Handler) http.Handler {
