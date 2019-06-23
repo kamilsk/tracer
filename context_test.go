@@ -12,14 +12,14 @@ func TestContext(t *testing.T) {
 		if Fetch(context.Background()) != nil {
 			t.Error("expected nil")
 		}
-		Fetch(context.Background()).Start().Mark("no panic").Stop()
+		Fetch(context.Background()).Start("no panic").Stop()
 	})
 	t.Run("fetch injected", func(t *testing.T) {
 		ctx := Inject(context.Background(), nil)
 		if Fetch(ctx) == nil {
 			t.Error("unexpected nil")
 		}
-		Fetch(ctx).Start().Mark("allocation").Stop()
+		Fetch(ctx).Start("allocation").Stop()
 	})
 }
 

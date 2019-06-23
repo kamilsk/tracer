@@ -64,12 +64,12 @@ func Handle(rw http.ResponseWriter, req *http.Request) {
 	ctx, cancel := context.WithTimeout(req.Context(), time.Second)
 	defer cancel()
 
-	call := tracer.Fetch(req.Context()).Start().Mark(req.Header.Get("X-Request-Id"))
+	call := tracer.Fetch(req.Context()).Start(req.Header.Get("X-Request-Id"))
 	defer call.Stop()
 
 	time.Sleep(time.Millisecond)
 
-	call.Checkpoint().Mark("serialize")
+	call.Checkpoint("serialize")
 	data, err := FetchData(ctx, req.Body)
 	if err != nil {
 		http.Error(rw, err.Error(), http.StatusInternalServerError)
@@ -78,7 +78,7 @@ func Handle(rw http.ResponseWriter, req *http.Request) {
 
 	time.Sleep(time.Millisecond)
 
-	call.Checkpoint().Mark("store")
+	call.Checkpoint("store")
 	if err := StoreIntoDatabase(ctx, data); err != nil {
 		http.Error(rw, err.Error(), http.StatusInternalServerError)
 		return

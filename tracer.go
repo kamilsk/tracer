@@ -12,15 +12,19 @@ type Trace struct {
 	allocates int
 }
 
-func (trace *Trace) Start() *Call {
+func (trace *Trace) Start(labels ...string) *Call {
 	if trace == nil {
 		return nil
 	}
 
+	var id string
+	if len(labels) > 0 {
+		id, labels = labels[0], labels[1:]
+	}
+	call := &Call{id: id, labels: labels, caller: Caller(3), start: time.Now()}
 	if len(trace.stack) == cap(trace.stack) {
 		trace.allocates++
 	}
-	call := &Call{caller: Caller(3), start: time.Now()}
 	trace.stack = append(trace.stack, call)
 	return call
 }
@@ -68,34 +72,30 @@ func (trace *Trace) String() string {
 }
 
 type Call struct {
+	id          string
+	labels      []string
 	caller      CallerInfo
 	start, stop time.Time
-	id          string
 	checkpoints []*Checkpoint
 	allocates   int
 }
 
-func (call *Call) Checkpoint() *Checkpoint {
+func (call *Call) Checkpoint(labels ...string) *Checkpoint {
 	if call == nil {
 		return nil
 	}
 
-	checkpoint := &Checkpoint{timestamp: time.Now()}
+	var id string
+	if len(labels) > 0 {
+		id, labels = labels[0], labels[1:]
+	}
+	checkpoint := &Checkpoint{id: id, labels: labels, timestamp: time.Now()}
 	if len(call.checkpoints) == cap(call.checkpoints) {
 		call.allocates++
 	}
 	call.checkpoints = append(call.checkpoints, checkpoint)
 
 	return checkpoint
-}
-
-func (call *Call) Mark(id string) *Call {
-	if call == nil {
-		return nil
-	}
-
-	call.id = id
-	return call
 }
 
 func (call *Call) Stop() {
@@ -108,13 +108,6 @@ func (call *Call) Stop() {
 
 type Checkpoint struct {
 	id        string
+	labels    []string
 	timestamp time.Time
-}
-
-func (checkpoint *Checkpoint) Mark(id string) {
-	if checkpoint == nil {
-		return
-	}
-
-	checkpoint.id = id
 }

@@ -5,6 +5,9 @@ GOFLAGS     = -mod=vendor
 TIMEOUT     = 1s
 
 
+.DEFAULT_GOAL = test
+
+
 .PHONY: deps
 deps:
 	@go mod tidy && go mod vendor && go mod verify

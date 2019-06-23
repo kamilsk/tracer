@@ -9,8 +9,8 @@ import (
 )
 
 func TestTrace_Start(t *testing.T) {
-	(*Trace)(nil).Start().Mark("no panic")
-	(&Trace{}).Start().Mark("one allocation")
+	(*Trace)(nil).Start("no panic")
+	(&Trace{}).Start("one allocation")
 }
 
 func TestTrace_String(t *testing.T) {
@@ -26,8 +26,8 @@ func TestTrace_String(t *testing.T) {
 			t.Errorf("\n expected: %+#v \n obtained: %+#v", expected, obtained)
 		}
 
-		call := trace.Start().Mark("fn call")
-		call.Checkpoint().Mark("checkpoint")
+		call := trace.Start("fn call")
+		call.Checkpoint("checkpoint")
 		call.Stop()
 		if expected, obtained := "allocates at call stack: 1", trace.String(); !strings.Contains(obtained, expected) {
 			t.Errorf("\n expected: %+#v \n obtained: %+#v", expected, obtained)
@@ -36,23 +36,13 @@ func TestTrace_String(t *testing.T) {
 }
 
 func TestCall_Checkpoint(t *testing.T) {
-	(*Call)(nil).Checkpoint().Mark("no panic")
-	(&Call{}).Checkpoint().Mark("one allocation")
-}
-
-func TestCall_Mark(t *testing.T) {
-	(*Call)(nil).Mark("no panic")
-	(&Call{}).Mark("by id")
+	(*Call)(nil).Checkpoint("no panic")
+	(&Call{}).Checkpoint("one allocation")
 }
 
 func TestCall_Stop(t *testing.T) {
-	(*Call)(nil).Mark("no panic").Stop()
-	(&Call{}).Mark("success").Stop()
-}
-
-func TestCheckpoint_Mark(t *testing.T) {
-	(*Checkpoint)(nil).Mark("no panic")
-	(&Checkpoint{}).Mark("by id")
+	(*Call)(nil).Stop()
+	(&Call{}).Stop()
 }
 
 // BenchmarkTracing/silent-12         	  200000	      7755 ns/op	    1816 B/op	      24 allocs/op
