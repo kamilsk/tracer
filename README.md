@@ -2,6 +2,8 @@
 >
 > Simple, lightweight tracing mechanism.
 
+[![Build][icon_build]][page_build]
+[![Coverage][icon_coverage]][page_coverage]
 [![Documentation][icon_docs]][page_docs]
 
 ## 💡 Idea
@@ -97,9 +99,11 @@ $ go get -u github.com/kamilsk/tracer
 made with ❤️ for everyone
 
 [icon_build]:      https://travis-ci.org/kamilsk/tracer.svg?branch=master
+[icon_coverage]:   https://api.codeclimate.com/v1/badges/fb66449d1f5c64542377/test_coverage
 [icon_docs]:       https://godoc.org/github.com/kamilsk/tracer?status.svg
 
 [page_build]:      https://travis-ci.org/kamilsk/tracer
+[page_coverage]:   https://codeclimate.com/github/kamilsk/tracer/test_coverage
 [page_docs]:       https://godoc.org/github.com/kamilsk/tracer
 [page_promo]:      https://github.com/kamilsk/tracer
 

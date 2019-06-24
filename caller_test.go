@@ -1,7 +1,7 @@
 package tracer_test
 
 import (
-	"reflect"
+	"strings"
 	"testing"
 
 	. "github.com/kamilsk/tracer"
@@ -11,17 +11,28 @@ func TestCaller(t *testing.T) {
 	tests := []struct {
 		name     string
 		caller   func() CallerInfo
-		expected string
+		expected []string
 	}{
-		{"direct caller", callerA, "github.com/kamilsk/tracer_test.callerA"},
-		{"chain caller", callerB, "github.com/kamilsk/tracer_test.callerA"},
-		{"lambda caller", callerC, "github.com/kamilsk/tracer_test.callerC"},
+		{"direct caller", callerA, []string{"github.com/kamilsk/tracer_test.callerA"}},
+		{"chain caller", callerB, []string{"github.com/kamilsk/tracer_test.callerA"}},
+		{"lambda caller", callerC, []string{
+			"github.com/kamilsk/tracer_test.callerC",
+			"github.com/kamilsk/tracer_test.callerC.func1", // Go 1.10, 1.11 - https://golang.org/doc/go1.12#runtime
+		}},
 	}
 	for _, test := range tests {
 		tc := test
 		t.Run(test.name, func(t *testing.T) {
-			if expected, obtained := tc.expected, tc.caller().Name; !reflect.DeepEqual(tc.expected, obtained) {
-				t.Errorf("\n expected: %+#v \n obtained: %+#v", expected, obtained)
+			var found bool
+			obtained := tc.caller().Name
+			for _, expected := range tc.expected {
+				if expected == obtained {
+					found = true
+					break
+				}
+			}
+			if !found {
+				t.Errorf("\n expected: %+#v \n obtained: %+#v", strings.Join(tc.expected, " or "), obtained)
 			}
 		})
 	}
