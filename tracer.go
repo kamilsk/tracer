@@ -7,11 +7,19 @@ import (
 	"time"
 )
 
+// Trace holds information about a current execution flow.
 type Trace struct {
 	stack     []*Call
 	allocates int
 }
 
+// Start creates a call entry and marks its start time.
+//
+//  func Do(ctx context.Context) {
+//  	call := tracer.Fetch(ctx).Start()
+//  	defer call.Stop()
+//  }
+//
 func (trace *Trace) Start(labels ...string) *Call {
 	if trace == nil {
 		return nil
@@ -29,6 +37,7 @@ func (trace *Trace) Start(labels ...string) *Call {
 	return call
 }
 
+// String returns a string representation of the current execution flow.
 func (trace *Trace) String() string {
 	if trace == nil {
 		return ""
@@ -71,6 +80,7 @@ func (trace *Trace) String() string {
 	return builder.String()
 }
 
+// Call holds information about a current function call.
 type Call struct {
 	id          string
 	labels      []string
@@ -80,6 +90,18 @@ type Call struct {
 	allocates   int
 }
 
+// Checkpoint stores timestamp of a current execution position of the current call.
+//
+//  func Do(ctx context.Context) {
+//  	call := tracer.Fetch(ctx).Start()
+//  	defer call.Stop()
+//  	...
+//  	call.Checkpoint()
+//  	...
+//  	call.Checkpoint("id", "labelX", "labelY")
+//  	...
+//  }
+//
 func (call *Call) Checkpoint(labels ...string) {
 	if call == nil {
 		return
@@ -96,6 +118,13 @@ func (call *Call) Checkpoint(labels ...string) {
 	call.checkpoints = append(call.checkpoints, checkpoint)
 }
 
+// Stop marks the end time of the current call.
+//
+//  func Do(ctx context.Context) {
+//  	defer tracer.Fetch(ctx).Start().Stop()
+//  	...
+//  }
+//
 func (call *Call) Stop() {
 	if call == nil {
 		return
@@ -104,6 +133,7 @@ func (call *Call) Stop() {
 	call.stop = time.Now()
 }
 
+// Checkpoint holds information about a current execution position of a current call.
 type Checkpoint struct {
 	id        string
 	labels    []string
