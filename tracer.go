@@ -76,26 +76,24 @@ type Call struct {
 	labels      []string
 	caller      CallerInfo
 	start, stop time.Time
-	checkpoints []*Checkpoint
+	checkpoints []Checkpoint
 	allocates   int
 }
 
-func (call *Call) Checkpoint(labels ...string) *Checkpoint {
+func (call *Call) Checkpoint(labels ...string) {
 	if call == nil {
-		return nil
+		return
 	}
 
 	var id string
 	if len(labels) > 0 {
 		id, labels = labels[0], labels[1:]
 	}
-	checkpoint := &Checkpoint{id: id, labels: labels, timestamp: time.Now()}
+	checkpoint := Checkpoint{id: id, labels: labels, timestamp: time.Now()}
 	if len(call.checkpoints) == cap(call.checkpoints) {
 		call.allocates++
 	}
 	call.checkpoints = append(call.checkpoints, checkpoint)
-
-	return checkpoint
 }
 
 func (call *Call) Stop() {

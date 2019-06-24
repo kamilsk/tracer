@@ -5,7 +5,7 @@ GOFLAGS     = -mod=vendor
 TIMEOUT     = 1s
 
 
-.DEFAULT_GOAL = test
+.DEFAULT_GOAL = test-with-coverage
 
 
 .PHONY: deps

@@ -4,6 +4,7 @@
 
 [![Build][icon_build]][page_build]
 [![Coverage][icon_coverage]][page_coverage]
+[![Quality][icon_quality]][page_quality]
 [![Documentation][icon_docs]][page_docs]
 
 ## 💡 Idea
@@ -82,6 +83,17 @@ func StoreIntoDatabase(ctx context.Context, data Data) error {
 }
 ```
 
+Output:
+
+```
+allocates at call stack: 1, detailed call stack:
+	call tracer_test.Handle [ca7a87c4-58d0-4fdf-857c-ef49fc3bf271]: 14.038083ms, allocates: 2
+		checkpoint [serialize]: 1.163587ms
+		checkpoint [store]: 2.436265ms
+	call tracer_test.FetchData: 1.192829ms, allocates: 0
+	call tracer_test.StoreIntoDatabase: 10.428663ms, allocates: 0
+```
+
 ## 🧩 Integration
 
 This library uses [SemVer](https://semver.org/) for versioning, and it is not
@@ -101,11 +113,13 @@ made with ❤️ for everyone
 [icon_build]:      https://travis-ci.org/kamilsk/tracer.svg?branch=master
 [icon_coverage]:   https://api.codeclimate.com/v1/badges/fb66449d1f5c64542377/test_coverage
 [icon_docs]:       https://godoc.org/github.com/kamilsk/tracer?status.svg
+[icon_quality]:    https://goreportcard.com/badge/github.com/kamilsk/tracer
 
 [page_build]:      https://travis-ci.org/kamilsk/tracer
 [page_coverage]:   https://codeclimate.com/github/kamilsk/tracer/test_coverage
 [page_docs]:       https://godoc.org/github.com/kamilsk/tracer
 [page_promo]:      https://github.com/kamilsk/tracer
+[page_quality]:    https://goreportcard.com/report/github.com/kamilsk/tracer
 
 [dep]:             https://golang.github.io/dep/
 [gomod]:           https://github.com/golang/go/wiki/Modules

@@ -45,16 +45,23 @@ func TestCall_Stop(t *testing.T) {
 	(&Call{}).Stop()
 }
 
-// BenchmarkTracing/silent-12         	  200000	      7755 ns/op	    1816 B/op	      24 allocs/op
-// BenchmarkTracing/full-12           	  200000	      8880 ns/op	    3944 B/op	      45 allocs/op
+// BenchmarkTracing/overhead-12         	 2000000	       616 ns/op	     144 B/op	       9 allocs/op
+// BenchmarkTracing/silent-12           	  200000	      7478 ns/op	    2320 B/op	      27 allocs/op
+// BenchmarkTracing/active-12           	  200000	      9221 ns/op	    4448 B/op	      48 allocs/op
 func BenchmarkTracing(b *testing.B) {
+	b.Run("overhead", func(b *testing.B) {
+		b.ReportAllocs()
+		for i := 0; i < b.N; i++ {
+			traceRoot(context.Background())
+		}
+	})
 	b.Run("silent", func(b *testing.B) {
 		b.ReportAllocs()
 		for i := 0; i < b.N; i++ {
 			traceRoot(Inject(context.Background(), make([]*Call, 0, 9)))
 		}
 	})
-	b.Run("full", func(b *testing.B) {
+	b.Run("active", func(b *testing.B) {
 		b.ReportAllocs()
 		for i := 0; i < b.N; i++ {
 			ctx := Inject(context.Background(), make([]*Call, 0, 9))
