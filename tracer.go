@@ -16,7 +16,7 @@ type Trace struct {
 // Start creates a call entry and marks its start time.
 //
 //  func Do(ctx context.Context) {
-//  	call := tracer.Fetch(ctx).Start()
+//  	call := tracer.Fetch(ctx).Start("id", "labelX", "labelY")
 //  	defer call.Stop()
 //  }
 //

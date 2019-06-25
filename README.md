@@ -96,7 +96,7 @@ allocates at call stack: 1, detailed call stack:
 
 ## 🧩 Integration
 
-This library uses [SemVer](https://semver.org/) for versioning, and it is not
+The library uses [SemVer](https://semver.org) for versioning, and it is not
 [BC](https://en.wikipedia.org/wiki/Backward_compatibility)-safe through major releases.
 You can use [dep][] or [go modules][gomod] to manage its version.
 
