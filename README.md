@@ -9,6 +9,8 @@
 
 ## 💡 Idea
 
+The tracer provides API to trace execution flow.
+
 ```go
 func Do(ctx context.Context) {
 	defer tracer.Fetch(ctx).Start().Stop()
@@ -118,8 +120,8 @@ made with ❤️ for everyone
 [page_build]:      https://travis-ci.org/kamilsk/tracer
 [page_coverage]:   https://codeclimate.com/github/kamilsk/tracer/test_coverage
 [page_docs]:       https://godoc.org/github.com/kamilsk/tracer
-[page_promo]:      https://github.com/kamilsk/tracer
 [page_quality]:    https://goreportcard.com/report/github.com/kamilsk/tracer
 
 [dep]:             https://golang.github.io/dep/
 [gomod]:           https://github.com/golang/go/wiki/Modules
+[promo]:           https://github.com/kamilsk/tracer

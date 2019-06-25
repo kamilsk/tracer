@@ -40,3 +40,11 @@ test-with-coverage:
 .PHONY: test-with-coverage-profile
 test-with-coverage-profile:
 	@go test -cover -covermode count -coverprofile c.out -timeout $(TIMEOUT) ./...
+
+
+.PHONY: sync
+sync:
+	@git stash && git pull --rebase && git stash pop || true
+
+.PHONY: upgrade
+upgrade: sync update deps format test-with-coverage
