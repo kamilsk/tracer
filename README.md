@@ -1,6 +1,6 @@
 > # 🧶 tracer
 >
-> Simple, lightweight tracing mechanism.
+> Simple, lightweight tracing.
 
 [![Build][icon_build]][page_build]
 [![Coverage][icon_coverage]][page_coverage]
@@ -89,11 +89,11 @@ Output:
 
 ```
 allocates at call stack: 1, detailed call stack:
-	call tracer_test.Handle [ca7a87c4-58d0-4fdf-857c-ef49fc3bf271]: 14.038083ms, allocates: 2
+	call Handle [ca7a87c4-58d0-4fdf-857c-ef49fc3bf271]: 14.038083ms, allocates: 2
 		checkpoint [serialize]: 1.163587ms
 		checkpoint [store]: 2.436265ms
-	call tracer_test.FetchData: 1.192829ms, allocates: 0
-	call tracer_test.StoreIntoDatabase: 10.428663ms, allocates: 0
+	call FetchData: 1.192829ms, allocates: 0
+	call StoreIntoDatabase: 10.428663ms, allocates: 0
 ```
 
 ## 🧩 Integration
