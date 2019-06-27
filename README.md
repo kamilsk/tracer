@@ -3,9 +3,9 @@
 > Simple, lightweight tracing.
 
 [![Build][icon_build]][page_build]
-[![Coverage][icon_coverage]][page_coverage]
 [![Quality][icon_quality]][page_quality]
 [![Documentation][icon_docs]][page_docs]
+[![Coverage][icon_coverage]][page_coverage]
 
 ## 💡 Idea
 
