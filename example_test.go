@@ -16,15 +16,15 @@ import (
 	"github.com/kamilsk/tracer"
 )
 
-type Message struct {
-	Title   string `json:"title"`
-	Tagline string `json:"tagline"`
+type Data struct {
+	Title    string `json:"title"`
+	Subtitle string `json:"subtitle"`
 }
 
 func Example() {
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodPost, "/message",
-		strings.NewReader(`{"title": "tracer", "tagline": "🧶 Simple, lightweight tracing mechanism."}`))
+		strings.NewReader(`{"title": "tracer", "subtitle": "🧶 Simple, lightweight tracing mechanism."}`))
 	req.Header.Set("X-Request-Id", "ca7a87c4-58d0-4fdf-857c-ef49fc3bf271")
 
 	handler := InjectTracer(FlushTracer(http.HandlerFunc(Handle)))
@@ -32,7 +32,7 @@ func Example() {
 
 	_, _ = io.Copy(os.Stdout, strings.NewReader(stabilize(rec.Body.String())))
 	// Output:
-	// allocates at call stack: 1, detailed call stack:
+	// allocates at call stack: 0, detailed call stack:
 	// 	call Handle [ca7a87c4-58d0-4fdf-857c-ef49fc3bf271]: 12.345678ms, allocates: 2
 	// 		checkpoint [serialize]: 1.234567ms
 	// 		checkpoint [store]: 1.234567ms
@@ -40,17 +40,17 @@ func Example() {
 	// 	call StoreIntoDatabase: 12.345678ms, allocates: 0
 }
 
-func InjectTracer(handler http.Handler) http.Handler {
-	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-		req = req.WithContext(tracer.Inject(req.Context(), make([]*tracer.Call, 0, 2)))
-		handler.ServeHTTP(rw, req)
-	})
-}
-
 func FlushTracer(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		handler.ServeHTTP(rw, req)
 		_, _ = rw.Write([]byte(tracer.Fetch(req.Context()).String()))
+	})
+}
+
+func InjectTracer(handler http.Handler) http.Handler {
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		req = req.WithContext(tracer.Inject(req.Context(), make([]*tracer.Call, 0, 10)))
+		handler.ServeHTTP(rw, req)
 	})
 }
 
@@ -81,16 +81,16 @@ func Handle(rw http.ResponseWriter, req *http.Request) {
 	rw.WriteHeader(http.StatusOK)
 }
 
-func FetchData(ctx context.Context, r io.Reader) (Message, error) {
+func FetchData(ctx context.Context, r io.Reader) (Data, error) {
 	defer tracer.Fetch(ctx).Start().Stop()
 
 	time.Sleep(time.Millisecond)
-	var data Message
+	var data Data
 	err := json.NewDecoder(r).Decode(&data)
 	return data, err
 }
 
-func StoreIntoDatabase(ctx context.Context, data Message) error {
+func StoreIntoDatabase(ctx context.Context, data Data) error {
 	defer tracer.Fetch(ctx).Start().Stop()
 
 	time.Sleep(10 * time.Millisecond)
