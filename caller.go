@@ -20,8 +20,8 @@ func Caller(skip int) CallerInfo {
 
 // CallerInfo holds information about a caller.
 type CallerInfo struct {
-	Entry uintptr
-	Name  string
-	File  string
-	Line  int
+	Entry uintptr // the entry address of the function
+	Name  string  // the name of the function
+	File  string  // the file name and
+	Line  int     // line number of the source code of the function
 }
