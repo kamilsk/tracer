@@ -15,12 +15,13 @@ func Caller(skip int) CallerInfo {
 	runtime.Callers(skip, pc)
 	f := runtime.FuncForPC(pc[0])
 	file, line := f.FileLine(pc[0])
-	return CallerInfo{f.Name(), file, line}
+	return CallerInfo{f.Entry(), f.Name(), file, line}
 }
 
 // CallerInfo holds information about a caller.
 type CallerInfo struct {
-	Name string
-	File string
-	Line int
+	Entry uintptr
+	Name  string
+	File  string
+	Line  int
 }
