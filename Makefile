@@ -1,7 +1,7 @@
-SHELL       = /bin/bash -euo pipefail
-PKGS        = $(shell go list ./... | grep -v vendor)
 GO111MODULE = on
 GOFLAGS     = -mod=vendor
+PKGS        = $(shell go list ./... | grep -v vendor)
+SHELL       = /bin/bash -euo pipefail
 TIMEOUT     = 1s
 
 
@@ -19,7 +19,7 @@ update:
 
 .PHONY: format
 format:
-	@goimports -local $(dirname $(go list -m)) -ungroup -w .
+	@goimports -local $(dirname $(go list -m)) -ungroup -w $(PKGS)
 
 .PHONY: generate
 generate:
