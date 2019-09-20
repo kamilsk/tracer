@@ -1,3 +1,3 @@
 module github.com/kamilsk/tracer
 
-go 1.13
+go 1.11
