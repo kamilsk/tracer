@@ -1,12 +1,13 @@
 > # 🧶 tracer
 >
-> Simple, lightweight tracing.
+> Dead simple, lightweight tracing.
 
-[![Build][icon_build]][page_build]
-[![Quality][icon_quality]][page_quality]
-[![Documentation][icon_docs]][page_docs]
-[![Coverage][icon_coverage]][page_coverage]
-[![Awesome][icon_awesome]][page_awesome]
+[![Build][build.icon]][build.page]
+[![Documentation][docs.icon]][docs.page]
+[![Quality][quality.icon]][quality.page]
+[![Template][template.icon]][template.page]
+[![Coverage][coverage.icon]][coverage.page]
+[![Awesome][awesome.icon]][awesome.page]
 
 ## 💡 Idea
 
@@ -105,34 +106,30 @@ allocates at call stack: 0, detailed call stack:
 
 The library uses [SemVer](https://semver.org) for versioning, and it is not
 [BC](https://en.wikipedia.org/wiki/Backward_compatibility)-safe through major releases.
-You can use [go modules](https://github.com/golang/go/wiki/Modules) or
-[dep](https://golang.github.io/dep/) to manage its version.
+You can use [go modules](https://github.com/golang/go/wiki/Modules) to manage its version.
 
 ```bash
-$ go get -u github.com/kamilsk/tracer
-
-$ dep ensure -add github.com/kamilsk/tracer
+$ go get github.com/kamilsk/tracer@latest
 ```
 
 ---
 
 made with ❤️ for everyone
 
-[icon_awesome]:     https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg
-[icon_build]:       https://travis-ci.org/kamilsk/tracer.svg?branch=master
-[icon_coverage]:    https://api.codeclimate.com/v1/badges/fb66449d1f5c64542377/test_coverage
-[icon_docs]:        https://godoc.org/github.com/kamilsk/tracer?status.svg
-[icon_quality]:     https://goreportcard.com/badge/github.com/kamilsk/tracer
-
-[page_awesome]:     https://github.com/avelino/awesome-go#performance
-[page_build]:       https://travis-ci.org/kamilsk/tracer
-[page_coverage]:    https://codeclimate.com/github/kamilsk/tracer/test_coverage
-[page_docs]:        https://godoc.org/github.com/kamilsk/tracer
-[page_quality]:     https://goreportcard.com/report/github.com/kamilsk/tracer
-
-[design]:           https://www.notion.so/octolab/tracer-098c6f9fe97b41dcac4a30074463dc8f?r=0b753cbf767346f5a6fd51194829a2f3
-[egg]:              https://github.com/kamilsk/egg
-[promo]:            https://github.com/kamilsk/tracer
+[awesome.page]:     https://github.com/avelino/awesome-go#performance
+[awesome.icon]:     https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg
+[build.page]:       https://travis-ci.org/kamilsk/tracer
+[build.icon]:       https://travis-ci.org/kamilsk/tracer.svg?branch=master
+[coverage.page]:    https://codeclimate.com/github/kamilsk/tracer/test_coverage
+[coverage.icon]:    https://api.codeclimate.com/v1/badges/fb66449d1f5c64542377/test_coverage
+[design.page]:      https://www.notion.so/octolab/tracer-098c6f9fe97b41dcac4a30074463dc8f?r=0b753cbf767346f5a6fd51194829a2f3
+[docs.page]:        https://pkg.go.dev/github.com/kamilsk/tracer
+[docs.icon]:        https://img.shields.io/badge/docs-pkg.go.dev-blue
+[promo.page]:       https://github.com/kamilsk/tracer
+[quality.page]:     https://goreportcard.com/report/github.com/kamilsk/tracer
+[quality.icon]:     https://goreportcard.com/badge/github.com/kamilsk/tracer
+[template.page]:    https://github.com/octomation/go-module
+[template.icon]:    https://img.shields.io/badge/template-go--module-blue
 
 [tmp.docs]:         https://nicedoc.io/kamilsk/tracer?theme=dark
 [tmp.history]:      https://github.githistory.xyz/kamilsk/tracer/blob/master/README.md
