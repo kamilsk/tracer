@@ -21,7 +21,7 @@ func Do(ctx context.Context) {
 }
 ```
 
-Full description of the idea is available [here][design].
+A full description of the idea is available [here][design.page].
 
 ## 🏆 Motivation
 
@@ -118,8 +118,8 @@ made with ❤️ for everyone
 
 [awesome.page]:     https://github.com/avelino/awesome-go#performance
 [awesome.icon]:     https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg
-[build.page]:       https://travis-ci.org/kamilsk/tracer
-[build.icon]:       https://travis-ci.org/kamilsk/tracer.svg?branch=master
+[build.page]:       https://travis-ci.com/kamilsk/tracer
+[build.icon]:       https://travis-ci.com/kamilsk/tracer.svg?branch=master
 [coverage.page]:    https://codeclimate.com/github/kamilsk/tracer/test_coverage
 [coverage.icon]:    https://api.codeclimate.com/v1/badges/fb66449d1f5c64542377/test_coverage
 [design.page]:      https://www.notion.so/octolab/tracer-098c6f9fe97b41dcac4a30074463dc8f?r=0b753cbf767346f5a6fd51194829a2f3
@@ -130,6 +130,3 @@ made with ❤️ for everyone
 [quality.icon]:     https://goreportcard.com/badge/github.com/kamilsk/tracer
 [template.page]:    https://github.com/octomation/go-module
 [template.icon]:    https://img.shields.io/badge/template-go--module-blue
-
-[tmp.docs]:         https://nicedoc.io/kamilsk/tracer?theme=dark
-[tmp.history]:      https://github.githistory.xyz/kamilsk/tracer/blob/master/README.md
